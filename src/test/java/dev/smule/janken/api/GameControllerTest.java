@@ -39,4 +39,30 @@ class GameControllerTest {
         .andExpect(jsonPath("$.id").value(gameId))
         .andExpect(jsonPath("$.player1").value("Lisa"));
   }
+
+  @Test
+  void rejectsOutOfOrderMoves() throws Exception {
+    var createResult = mockMvc.perform(post("/api/games")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"name\":\"Lisa\"}"))
+        .andExpect(status().isCreated())
+        .andReturn();
+
+    var gameId = JsonPath.read(createResult.getResponse().getContentAsString(), "$.id");
+
+    mockMvc.perform(post("/api/games/{id}/move", gameId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"name\":\"Lisa\",\"move\":\"ROCK\"}"))
+        .andExpect(status().isConflict());
+
+    mockMvc.perform(post("/api/games/{id}/join", gameId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"name\":\"Pelle\"}"))
+        .andExpect(status().isOk());
+
+    mockMvc.perform(post("/api/games/{id}/move", gameId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"name\":\"Pelle\",\"move\":\"SCISSORS\"}"))
+        .andExpect(status().isConflict());
+  }
 }

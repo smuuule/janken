@@ -20,6 +20,6 @@ public record GameOutcome(GameStatus status, Move winner) {
   }
 
   public boolean isTie() {
-    return winner == null;
+    return winner == null && status == GameStatus.COMPLETED;
   }
 }
