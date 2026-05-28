@@ -82,3 +82,4 @@ Make a move. Enter name and move in the request-body:
 
 - No database is used, states for games are kept in memory (no persitance)
 - Possible future improvements: stricter validation, more detailed error responses, custom names for move options, persistent repositories
+- Generative AI was not used to avoid overcomplicate project structure etc. GPT-5.4 Mini was however to try out how good it was at noticing vulnerabilities in the API. The findings of this was used when implementing the concurrent repository and games limiting.
