@@ -28,24 +28,20 @@ public class GameService {
   }
 
   public Game joinGame(String id, JoinGameRequest request) {
-    var game = requireGame(id);
-    if (game.player1().name().equals(request.name())) {
-      throw new IllegalStateException("player already joined");
-    }
+    return gameRepository.update(id, game -> {
+      if (game.player1().name().equals(request.name())) {
+        throw new IllegalStateException("player already joined");
+      }
 
-    var updatedGame = game.join(new Player(UUID.randomUUID().toString(), request.name()));
-    return gameRepository.save(updatedGame);
+      return game.join(new Player(UUID.randomUUID().toString(), request.name()));
+    });
   }
 
   public Game makeMove(String id, MoveRequest request) {
-    var game = requireGame(id);
-    var player = resolvePlayer(game, request.name());
-    var updatedGame = game.move(player, request.move());
-    return gameRepository.save(updatedGame);
-  }
-
-  private Game requireGame(String id) {
-    return gameRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("game not found"));
+    return gameRepository.update(id, game -> {
+      var player = resolvePlayer(game, request.name());
+      return game.move(player, request.move());
+    });
   }
 
   private Player resolvePlayer(Game game, String name) {
